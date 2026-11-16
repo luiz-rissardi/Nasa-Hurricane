@@ -1,0 +1,353 @@
+:host {
+    display: block;
+    position: relative;   // o globo vive dentro do .globe-host do app (não cobre mais a tela inteira nem o header)
+    width: 100%;
+    height: 100%;
+    background-color: #000;
+}
+
+.globe-wrapper {
+    position: relative;
+    width: 100%;          // 100vw/100vh incluíam a barra de rolagem e criavam sobra
+    height: 100%;
+    overflow: hidden;
+    margin: 0;
+    background-color: #000;
+}
+
+.canvas-container {
+    width: 100%;
+    height: 100%;
+    margin: 0 !important;
+    padding: 0 !important;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+}
+
+// O <canvas> é criado pelo three.js (fora do escopo do Angular), por isso o ::ng-deep.
+// display: block remove a faixa vazia que um canvas "inline" deixa embaixo.
+:host ::ng-deep .canvas-container canvas {
+    display: block;
+}
+
+// HUD original
+.hud {
+    position: absolute;
+    top: 20px;            // antes não tinha posição, então herdava o deslocamento do body
+    left: 20px;
+    z-index: 100;
+    pointer-events: auto;
+
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(10px);
+
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 16px 20px;
+    border-radius: 12px;
+
+    color: #f8fafc;
+    font-family: system-ui, -apple-system, sans-serif;
+
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+
+    width: 100%;
+    max-width: 420px;
+    max-height: calc(100% - 40px);   // em telas baixas o painel rola em vez de ser cortado
+    overflow-y: auto;
+    box-sizing: border-box;
+
+    // Barra de rolagem fina e escura, combinando com o painel
+    scrollbar-width: thin;                                        // Firefox
+    scrollbar-color: rgba(56, 189, 248, 0.45) transparent;
+
+    @supports selector(::-webkit-scrollbar) {                     // Chrome, Edge, Safari
+        scrollbar-width: auto;
+        scrollbar-color: auto;
+
+        &::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        &::-webkit-scrollbar-track {
+            background: transparent;
+            margin: 12px 0;                                       // afasta a barra dos cantos arredondados
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background: rgba(148, 163, 184, 0.35);
+            border-radius: 999px;
+            border: 2px solid transparent;                        // respiro em volta
+            background-clip: padding-box;
+        }
+
+        &::-webkit-scrollbar-thumb:hover {
+            background: rgba(56, 189, 248, 0.7);
+            background-clip: padding-box;
+        }
+    }
+
+    h2 {
+        font-size: 18px;
+        font-weight: 600;
+        margin: 0 0 12px;
+        color: #38bdf8;
+    }
+
+    p {
+        margin: 6px 0;
+        font-size: 13px;
+        color: #cbd5e1;
+    }
+
+    button {
+        margin-top: 14px;
+        width: 100%;
+        background: #38bdf8;
+        color: #0f172a;
+        border: none;
+        padding: 9px 14px;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 13px;
+        cursor: pointer;
+        transition: background 0.2s, transform 0.1s;
+
+        &:hover {
+            background: #0ea5e9;
+        }
+
+        &:active {
+            transform: scale(0.98);
+        }
+    }
+}
+
+// Legenda original
+.original-legend {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-top: 12px !important;
+    color: #f8fafc !important;
+    font-weight: 600;
+}
+
+// Legenda de temperatura e velocidade
+.temperature-legend {
+    margin-top: 22px;
+    padding-top: 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+
+    h3 {
+        font-size: 16px;
+        font-weight: 600;
+        color: #f8fafc;
+        margin: 0 0 18px;
+    }
+}
+
+// Gradiente de temperatura
+.temperature-gradient,
+.speed-gradient {
+    width: 100%;
+    height: 12px;
+    display: block;
+    border-radius: 20px;
+}
+
+// (a cor real vem do [style.background] do HTML; este é só o valor de reserva)
+.temperature-gradient {
+    background: linear-gradient(to right,
+            #466eff 0%,
+            #32c8ff 25%,
+            #aaff78 50%,
+            #ffb428 75%,
+            #ff321e 100%);
+}
+
+// Gradiente de velocidade
+.speed-gradient {
+    background: linear-gradient(to right,
+            #5a96ff 0%,
+            #50dcd2 35%,
+            #aaff78 65%,
+            #ffffeb 100%);
+}
+
+// Valores da escala
+.temperature-values {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 8px;
+    gap: 4px;
+
+    span {
+        font-size: 11px;
+        color: #94a3b8;
+        white-space: nowrap;
+    }
+}
+
+// Descrições
+.temperature-description {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    margin-top: 17px;
+
+    div {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        font-size: 13px;
+        color: #cbd5e1;
+    }
+}
+
+// Indicadores coloridos
+.dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+
+    &.cold {
+        background: #466eff;
+    }
+
+    &.cool {
+        background: #32c8ff;
+    }
+
+    &.mild {
+        background: #aaff78;
+    }
+
+    &.warm {
+        background: #ffb428;
+    }
+
+    &.hot {
+        background: #ff321e;
+    }
+}
+
+
+// Responsividade
+@media (max-width: 600px) {
+    .hud {
+        top: 12px;
+        left: 12px;
+        right: 12px;
+        max-width: none;
+        width: auto;
+        padding: 14px;
+    }
+
+    .hud h2 {
+        font-size: 16px;
+    }
+}
+
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.time-filter {
+    margin: 14px 0 4px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+
+    h3 {
+        margin: 0 0 8px;
+        font-size: 13px;
+        font-weight: 600;
+        color: #cbd5e1;
+    }
+
+    .time-row {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+    }
+
+    .time-date {
+        flex: 1;
+        min-width: 0;
+        padding: 6px 8px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        background: rgba(2, 6, 23, 0.6);
+        color: #f8fafc;
+        font: inherit;
+        font-size: 13px;
+        color-scheme: dark;          // calendário nativo em tema escuro
+    }
+
+    // O ".hud button" geral usa width:100% e margin-top: aqui os botões são pequenos
+    .time-btn {
+        width: 34px;
+        margin: 0;
+        padding: 5px 0;
+        border-radius: 8px;
+        font-size: 16px;
+        line-height: 1;
+        background: rgba(56, 189, 248, 0.18);
+        color: #38bdf8;
+        border: 1px solid rgba(56, 189, 248, 0.35);
+
+        &:hover { background: rgba(56, 189, 248, 0.3); }
+    }
+
+    .time-range {
+        width: 100%;
+        margin: 12px 0 4px;
+        accent-color: #38bdf8;
+    }
+
+    .time-label {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 12px;
+        color: #cbd5e1;
+
+        span:first-child {
+            display: inline-block;
+
+            &::first-letter { text-transform: uppercase; }
+        }
+    }
+
+    .time-kind {
+        padding: 2px 8px;
+        border-radius: 999px;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        background: rgba(148, 163, 184, 0.2);
+
+        &[data-kind='previsão'] { background: rgba(251, 191, 36, 0.2); color: #fbbf24; }
+        &[data-kind='passado']  { background: rgba(167, 139, 250, 0.2); color: #a78bfa; }
+        &[data-kind='agora']    { background: rgba(52, 211, 153, 0.2); color: #34d399; }
+    }
+
+    .time-now {
+        margin-top: 10px;
+        padding: 6px 0;
+        font-size: 12px;
+        background: transparent;
+        color: #38bdf8;
+        border: 1px solid rgba(56, 189, 248, 0.4);
+
+        &:hover:not(:disabled) { background: rgba(56, 189, 248, 0.15); }
+        &:disabled { opacity: 0.4; cursor: default; }
+    }
+}

@@ -1,0 +1,56 @@
+// Posição: canto inferior direito do .globe-wrapper (ele precisa ter position: relative)
+:host {
+    position: absolute;
+    right: 20px;
+    bottom: 20px;
+    z-index: 20;
+    width: min(560px, calc(100vw - 40px));
+    pointer-events: none;   // não atrapalha girar o globo nem o tooltip
+}
+
+.scale {
+    display: flex;
+    overflow: hidden;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+    font-variant-numeric: tabular-nums;
+}
+
+// Cabeçalho "°C", como na legenda de referência
+.unit {
+    flex: 0 0 38px;
+    display: grid;
+    place-items: center;
+    background: #ffffff;
+    color: #0b1224;
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+// Uma célula por cor da escala, do frio (esquerda) ao quente (direita)
+.cell {
+    flex: 1 1 0;
+    min-width: 0;
+    height: 30px;
+    display: grid;
+    place-items: center;
+    font-size: clamp(0.55rem, 1.6vw, 0.74rem);
+    font-weight: 600;
+}
+
+@media (max-width: 520px) {
+    :host {
+        right: 10px;
+        bottom: 10px;
+        width: calc(100vw - 20px);
+    }
+
+    .unit {
+        flex-basis: 30px;
+    }
+
+    .cell {
+        height: 26px;
+    }
+}

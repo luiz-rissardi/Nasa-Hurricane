@@ -1,0 +1,106 @@
+<section class="trends">
+    <header class="top">
+        <a class="back" routerLink="/project">← Back to the globe</a>
+        <p class="eyebrow">Earth System Trend Detective</p>
+        <h1>Is the weather here unusual, and where is the climate heading?</h1>
+        <p class="lead">
+            Each variable is compared with the NASA POWER climate normal (1991–2020) for the same time of year, and its
+            long-term trend is measured since 1981.
+        </p>
+    </header>
+
+    <form class="picker" (submit)="$event.preventDefault(); analyze(latEl.value, lonEl.value)">
+        <label>
+            Latitude
+            <input #latEl type="text" inputmode="decimal" [value]="lat()" aria-label="Latitude" />
+        </label>
+        <label>
+            Longitude
+            <input #lonEl type="text" inputmode="decimal" [value]="lon()" aria-label="Longitude" />
+        </label>
+        <button type="submit" class="go" [disabled]="status() === 'loading'">Analyze</button>
+
+        <div class="presets" role="group" aria-label="Example places">
+            @for (p of presets; track p.name) {
+            <button type="button" class="chip" (click)="usePreset(p)">{{ p.name }}</button>
+            }
+        </div>
+    </form>
+
+    @switch (status()) {
+    @case ('loading') {
+    <p class="notice" role="status">Reading 45 years of NASA data for this point…</p>
+    }
+    @case ('error') {
+    <p class="notice error" role="alert">{{ error() }}</p>
+    }
+    @case ('ready') {
+    @if (headline()) {
+    <p class="headline">{{ headline() }}</p>
+    }
+
+    <div class="cards">
+        @for (c of cards(); track c.key) {
+        <article class="card">
+            <h2>{{ c.icon }} {{ c.label }}</h2>
+
+            @if (c.current; as cur) {
+            <div class="now">
+                <span class="value">{{ cur.value.toFixed(c.digits) }}<small> {{ c.unit }}</small></span>
+                <span class="badge" [attr.data-level]="cur.level">{{ levelText(cur.level) }}</span>
+            </div>
+            <p class="detail">
+                Normal for this time of year: <strong>{{ cur.normal.toFixed(c.digits) }} {{ c.unit }}</strong><br />
+                Difference: <strong>{{ signed(cur.anomaly, c.digits) }} {{ c.unit }}</strong>
+                ({{ signed(cur.z, 1) }} standard deviations)
+            </p>
+
+            <div class="gauge" role="img"
+                [attr.aria-label]="'Position against the normal range: ' + levelText(cur.level)">
+                <span class="zone zone-normal"></span>
+                <span class="marker" [style.left.%]="c.gauge"></span>
+                <span class="tick tick-l">−3σ</span><span class="tick tick-m">normal</span><span class="tick tick-r">+3σ</span>
+            </div>
+            <p class="small">Average of the last {{ cur.days }} days with data (up to {{ cur.until }}).</p>
+            } @else {
+            <p class="small">Not enough recent data yet for this point.</p>
+            }
+
+            <h3>Long-term trend</h3>
+            @if (c.trend; as t) {
+            <div class="now">
+                <span class="value">{{ signed(t.slopePerDecade, 2) }}<small> {{ c.unit }} / decade</small></span>
+                <span class="badge" [attr.data-trend]="t.verdict">{{ verdictText(t) }}</span>
+            </div>
+            <p class="small">{{ t.n }} years, {{ c.from }}–{{ c.to }} · t = {{ t.t.toFixed(1) }}
+                ({{ t.verdict === 'stable' ? 'not distinguishable from natural variation' : 'statistically clear' }})</p>
+            }
+
+            <svg class="chart" [attr.viewBox]="viewBox" role="img" preserveAspectRatio="none"
+                [attr.aria-label]="c.label + ' yearly difference from the 1991–2020 normal, ' + c.from + ' to ' + c.to">
+                <line class="zero" x1="0" [attr.x2]="320" [attr.y1]="zeroY" [attr.y2]="zeroY" />
+                @for (b of c.bars; track b.year) {
+                <rect [attr.x]="b.x" [attr.y]="b.y" [attr.width]="b.w" [attr.height]="b.h" [class.up]="b.up"
+                    [class.down]="!b.up">
+                    <title>{{ b.year }}: {{ b.value }} {{ c.unit }}</title>
+                </rect>
+                }
+                @if (c.line; as l) {
+                <line class="trend" [attr.x1]="l.x1" [attr.y1]="l.y1" [attr.x2]="l.x2" [attr.y2]="l.y2" />
+                }
+            </svg>
+            <div class="axis"><span>{{ c.from }}</span><span>difference from the 1991–2020 normal</span><span>{{ c.to }}</span></div>
+        </article>
+        }
+    </div>
+
+    <p class="method">
+        Data: NASA POWER (MERRA-2 reanalysis), 1981 to last year, plus the most recent days. The normal is the 1991–2020
+        average of each calendar month. The yearly difference is the average of the twelve monthly differences, and the
+        trend is a least-squares line through them; it is shown as “clear” when |t| ≥ 2. Humidity and pressure are for
+        the grid cell (about 50 km), and pressure is measured at the surface, so it is not reduced to sea level. This
+        shows what happened at this place; it does not say why.
+    </p>
+    }
+    }
+</section>

@@ -1,0 +1,83 @@
+<div class="banner" role="img" aria-label="Astronaut on the lunar surface under a starry sky"></div>
+
+<section class="home">
+  <div class="hero">
+    <p class="eyebrow">3D weather visualization</p>
+    <h1>Kenobi Project</h1>
+    <p class="lead">
+      Kenobi Project is an interactive globe that shows, almost in real time, how the air moves and behaves over the
+      planet. It turns weather data into animated wind currents and color maps that users can rotate, zoom into and
+      explore.
+    </p>
+    <a class="cta" routerLink="/project">Open the globe</a>
+  </div>
+
+  <div class="grid">
+    <article class="card">
+      <h2>What it shows</h2>
+      <p>
+        The globe displays thousands of particles that follow the direction and speed of the wind in each region,
+        leaving trails that reveal the large circulations of the atmosphere. The particles can be colored by air
+        temperature or by wind speed, as the user chooses.
+      </p>
+    </article>
+
+    <article class="card">
+      <h2>Color layers</h2>
+      <p>
+        On the surface, the project offers two color layers: temperature and sea-level air pressure. Because both paint
+        the same surface, turning one on turns the other off. The wind layer is independent and can stay on together
+        with either of them. Each layer has its own legend.
+      </p>
+    </article>
+
+    <article class="card">
+      <h2>Information per point</h2>
+      <p>
+        When you hover over the globe, the project shows a small window with the location's coordinates, temperature,
+        wind speed and direction, pressure and humidity. When you click, it fetches the detailed data for that point,
+        including astronomical information.
+      </p>
+    </article>
+
+    <article class="card">
+      <h2>Where the data comes from</h2>
+      <p>
+        The data comes from the public Open-Meteo API, which the project queries just once for the whole globe. The
+        query covers a grid of 264 points spaced 15° apart and is refreshed periodically. From these points, the
+        project interpolates a continuous, smooth field that fills the regions between measurements.
+      </p>
+    </article>
+
+    <article class="card">
+      <h2>How it was built</h2>
+      <p>
+        The project uses Angular, with standalone components and signals, and three.js for 3D rendering. Layer colors
+        are computed on the graphics card, and the wind field calculation is split into small slices so the screen does
+        not freeze. The globe is only redrawn when something changes, which saves processing power and battery.
+      </p>
+    </article>
+
+    <article class="card">
+      <h2>Designed to be fast</h2>
+      <p>
+        The globe is created in the background while the user is still on this page and stays in memory when changing
+        routes. That is why it appears ready as soon as the project opens, without reloading on every visit.
+      </p>
+    </article>
+  </div>
+  <div class="future">
+    <p class="eyebrow">Next steps</p>
+    <h2 class="future-title">Ideas for future implementations</h2>
+
+    <p class="future-text">
+      The project plans to evolve from a weather visualization into a mathematical model that compares the current
+      state of the atmosphere with what is normal for each region of the planet. The model will combine the three air
+      variables, humidity, temperature and pressure, and will use geolocation to associate each point on the globe with
+      its climate zone and its historical average of about 30 years, showing whether the current value is above or
+      below what is expected. It also plans to include surface factors, such as vegetation cover, exposed soil and
+      degree of urbanization, which change the microclimate of each place, based on NASA's open databases. The focus
+      will be the model, not the forecasting of events.
+    </p>
+  </div>
+</section>

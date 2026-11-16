@@ -1,0 +1,7 @@
+<div class="scale" role="img" aria-label="Escala de cores de temperatura, de −50 a 45 graus Celsius">
+  <span class="unit">°C</span>
+
+  @for (cell of cells; track cell.temp) {
+    <span class="cell" [style.background]="cell.color" [style.color]="cell.textColor">{{ cell.label }}</span>
+  }
+</div>

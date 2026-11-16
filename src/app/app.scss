@@ -1,0 +1,67 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+/* Header que você já tinha */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.5rem;
+  height: 10vh;
+  flex-shrink: 0;
+  background: #0f172a;
+  border-bottom: 1px solid #1e293b;
+  font-family: Optima, Candara, 'Palatino Linotype', Palatino, Georgia, serif;
+}
+
+.title {
+  margin: 0;
+  color: #f8fafc;
+  font-size: 1.15rem;
+  font-family: Optima, Candara, 'Palatino Linotype', Palatino, Georgia, serif !important;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.nav { display: flex; gap: 0.5rem; }
+
+.link {
+  padding: 0.45rem 0.9rem;
+  border-radius: 8px;
+  color: #94a3b8;
+  text-decoration: none;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  transition: color 0.15s, background 0.15s;
+
+  &:hover  { color: #f8fafc; background: #1e293b; }
+  &.active { color: #38bdf8; background: #172033; }
+}
+
+/* Área abaixo do header: Home e globo dividem este espaço */
+.content {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+
+/* Globo sempre montado; visibility (e não display:none) mantém o tamanho para o three.js medir */
+.globe-host {
+  position: absolute;
+  inset: 0;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+
+  &.visible {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+  }
+}

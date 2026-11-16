@@ -1,0 +1,21 @@
+<header class="header">
+  <h2 class="title"> KENOBI PROJECT</h2>
+
+  <nav class="nav">
+    <a class="link" routerLink="/home" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Home</a>
+    <a class="link" routerLink="/trends" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">tendencias</a>
+    <a class="link" routerLink="/project" routerLinkActive="active">Project</a>
+  </nav>
+</header>
+
+<main class="content">
+  <router-outlet></router-outlet>
+
+  <!-- O globo vive aqui, fora do router: é criado uma única vez (quando o navegador está ocioso, já na Home)
+       e nunca é destruído ao trocar de rota. A rota /project só mostra/esconde esta camada. -->
+  @defer (on idle) {
+    <div class="globe-host" [class.visible]="isProject()">
+      <app-earth-globe [active]="isProject()" />
+    </div>
+  }
+</main>

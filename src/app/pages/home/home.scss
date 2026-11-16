@@ -1,0 +1,142 @@
+:host {
+  display: block;
+  height: 100%;
+  overflow-y: auto;
+  background: #03060d;
+  color: #e2e8f0;
+
+  // Padrão moderno (Firefox e Chrome/Edge atuais)
+  scrollbar-width: thin;
+  scrollbar-color: #38bdf8 #03060d;   // cor da barra | cor do fundo
+
+  // Fallback para Safari e navegadores mais antigos
+  &::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #03060d;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #1e3a5f;
+    border-radius: 999px;
+    border: 2px solid #03060d;        // cria um respiro em volta da barra
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: #38bdf8;
+  }
+}
+
+// Imagem no topo da página, escurecida e dissolvendo no fundo escuro
+// (coloque hero-nasa.png na pasta public/ do projeto)
+.banner {
+  height: clamp(300px, 50vh, 520px);
+  background:
+    linear-gradient(to bottom, rgba(3, 6, 13, 0.45) 0%, rgba(3, 6, 13, 0.3) 45%, #03060d 100%),
+    url('/nasa.webp') center top / cover no-repeat;
+}
+
+.home {
+  position: relative;
+  max-width: 1080px;
+  margin: -1.5rem auto 0;       // sobe um pouco para o título entrar na dissolução da imagem
+  padding: 0 1.5rem 5rem;
+}
+
+.hero {
+  max-width: 720px;
+  margin-bottom: 3.5rem;
+}
+
+.eyebrow {
+  margin: 0 0 0.75rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #38bdf8;
+}
+
+h1 {
+  margin: 0 0 1.25rem;
+  font-family: Optima, Candara, 'Palatino Linotype', Palatino, Georgia, serif;
+  font-size: clamp(2.2rem, 6vw, 3.6rem);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #f8fafc;
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.8);
+}
+
+.lead {
+  margin: 0 0 2rem;
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: #cbd5e1;
+}
+
+.cta {
+  display: inline-block;
+  padding: 0.8rem 1.6rem;
+  border-radius: 10px;
+  background: #38bdf8;
+  color: #03060d;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+  transition: transform 0.15s, box-shadow 0.15s;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(56, 189, 248, 0.35);
+  }
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.25rem;
+}
+
+.card {
+  padding: 1.5rem;
+  border-radius: 14px;
+  background: rgba(8, 12, 24, 0.85);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+
+  h2 {
+    margin: 0 0 0.6rem;
+    font-size: 1.05rem;
+    color: #38bdf8;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.65;
+    color: #b6c2d3;
+  }
+}
+
+// Seção "Ideias para implementações futuras"
+.future {
+  margin-top: 4.5rem;
+  padding-top: 3rem;
+  border-top: 1px solid rgba(148, 163, 184, 0.14);
+}
+
+.future-title {
+  margin: 0 0 0.9rem;
+  font-family: Optima, Candara, 'Palatino Linotype', Palatino, Georgia, serif;
+  font-size: clamp(1.5rem, 3.5vw, 2rem);
+  letter-spacing: 0.08em;
+  color: #f8fafc;
+}
+
+.future-text {
+  max-width: 760px;
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.8;
+  color: #cbd5e1;
+}
