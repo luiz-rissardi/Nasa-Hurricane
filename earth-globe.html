@@ -1,0 +1,148 @@
+<div class="globe-wrapper">
+    <!-- Clicking the canvas container now runs the integrated capture -->
+    <div #canvasContainer class="canvas-container" (click)="getWeatherDataOfLocation()"></div>
+
+    <div class="hud">
+        <h2>Earth System Trend Detective</h2>
+
+        <p>
+            Status: <strong>{{ apiStatus() }}</strong>
+            @if (refineText()) {
+            <small>· {{ refineText() }}</small>
+            }
+        </p>
+
+        <div class="filter-group">
+
+            <label class="radio-label">
+                <input type="checkbox" value="temperature" (change)="toggleLayer('temperature', $event)"
+                    [class.active]="activeLayers.has('temperature')">
+                <span>🌡️ Temperature</span>
+            </label>
+
+            <!-- Wind currents (starts on via [checked]="true") -->
+            <label class="radio-label">
+                <input type="checkbox" [checked]="true" value="wind" (change)="toggleLayer('wind', $event)"
+                    [class.active]="activeLayers.has('wind')">
+                <span>💨 Wind Currents</span>
+            </label>
+
+            <label class="radio-label">
+                <input type="checkbox" value="pressure" (change)="toggleLayer('pressure', $event)" />
+                🧭 Air pressure
+            </label>
+
+            <!-- Real NASA (GIBS) satellite images, with clouds; they follow the filter date -->
+            <label class="radio-label">
+                <input type="checkbox" value="satellite" (change)="toggleLayer('satellite', $event)" />
+                🛰️ Satellite images (clouds)
+            </label>
+        </div>
+
+        @if (satStatus()) {
+        <p class="legend">{{ satStatus() }}</p>
+        }
+
+        <!-- Date and time filter: all hours are already in memory, so changing it makes no request -->
+        @if (timeReady()) {
+        <div class="time-filter">
+            <h3>Date and time</h3>
+
+            <div class="time-row">
+                <input type="date" class="time-date" [value]="selDate()" [min]="dateMin()" [max]="dateMax()"
+                    (change)="onDateChange($event)">
+
+                <button type="button" class="time-btn" (click)="stepHour(-1)" aria-label="Previous hour">‹</button>
+                <button type="button" class="time-btn" (click)="stepHour(1)" aria-label="Next hour">›</button>
+            </div>
+
+            @if (dateNotice()) {
+            <p class="time-notice">{{ dateNotice() }}</p>
+            }
+
+            <input type="range" class="time-range" min="0" max="23" step="1" [value]="selHour()"
+                (input)="onHourChange($event)" aria-label="Hour of the day">
+
+            <div class="time-label">
+                <span>{{ timeLabel() }}</span>
+                <span class="time-kind" [attr.data-kind]="timeKind()">
+                    {{ updating() ? 'updating… ' + loadText() : timeKind() }}
+                </span>
+            </div>
+
+            <button type="button" class="time-now" (click)="goNow()" [disabled]="timeKind() === 'now'">
+                Back to now
+            </button>
+        </div>
+        }
+
+        @if (activeLayers.has('pressure')) {
+        <div class="temperature-legend">
+            <h3>Air pressure (sea level)</h3>
+            <div class="temperature-gradient" [style.background]="pressGradient"></div>
+            <div class="temperature-values">
+                @for (tick of pressTicks; track tick) {
+                <span>{{ tick }} hPa</span>
+                }
+            </div>
+            <p class="legend">Purple/blue: low</p>
+            <p class="legend">Orange/red: high</p>
+        </div>
+        }
+
+        <!-- Temperature legend (colors generated from temperature-scale.ts) -->
+        @if (colorMode() === 'temperature') {
+        <div class="temperature-legend">
+            <h3>Wind temperature</h3>
+
+            <div class="temperature-gradient" [style.background]="tempGradient"></div>
+
+            <div class="temperature-values">
+                @for (tick of tempTicks; track tick) {
+                <span>{{ tick }} °C</span>
+                }
+            </div>
+
+            <div class="temperature-description">
+                @for (band of tempBands; track band.label) {
+                <div>
+                    <span class="dot" [style.background]="band.color"></span>
+                    {{ band.label }} <small>({{ band.range }})</small>
+                </div>
+                }
+            </div>
+        </div>
+        }
+
+        <!-- Speed legend -->
+        @if (colorMode() === 'speed') {
+        <div class="temperature-legend">
+            <h3>Wind speed</h3>
+
+            <div class="speed-gradient"></div>
+
+            <div class="temperature-values">
+                <span>0 km/h</span>
+                <span>21 km/h</span>
+                <span>39 km/h</span>
+                <span>60 km/h</span>
+            </div>
+
+            <p class="legend">
+                Blue: weak wind | White: strong wind
+            </p>
+        </div>
+        }
+
+        <button type="button" (click)="setColorMode(
+        colorMode() === 'temperature' ? 'speed' : 'temperature'
+      )">
+            {{ colorMode() === 'temperature'
+            ? 'View speed'
+            : 'View temperature' }}
+        </button>
+    </div>
+
+    <app-info-gram></app-info-gram>
+    <app-temperature-legend></app-temperature-legend>
+</div>
