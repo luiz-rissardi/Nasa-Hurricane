@@ -260,6 +260,10 @@ export class EarthGlobe implements AfterViewInit, OnDestroy {
 
   private platformId = inject(PLATFORM_ID);
   private globeFacade = inject(GlobeFacade);
+
+  /** Estado do clique no globo (carregando / erro): vem do facade e é mostrado no HUD */
+  protected readonly loadingPoint = this.globeFacade.loadingPoint;
+  protected readonly pointError = this.globeFacade.pointError;
   private zone = inject(NgZone);
 
   constructor() {
@@ -1452,8 +1456,39 @@ export class EarthGlobe implements AfterViewInit, OnDestroy {
     this.tooltipDirty = true;
   };
   private onPointerLeave = (): void => { this.hover = false; this.hideTooltip(); };
-  private onPointerDown = (): void => { this.dragging = true; this.hideTooltip(); };
-  private onPointerUp = (): void => { this.dragging = false; this.applyCursor(); };
+  // Clique = soltou perto de onde apertou e rápido. Arrastar (girar o globo) não conta como clique.
+  private downX = 0;
+  private downY = 0;
+  private downT = 0;
+  private downOk = false;
+
+  private onPointerDown = (e: PointerEvent): void => {
+    this.dragging = true;
+    this.hideTooltip();
+    this.downOk = e.button === 0;
+    this.downX = e.offsetX;
+    this.downY = e.offsetY;
+    this.downT = performance.now();
+  };
+  private onPointerUp = (e: PointerEvent): void => {
+    this.dragging = false;
+    this.applyCursor();
+    // 'pointercancel' também chega aqui, e não é clique
+    const isClick = e.type === 'pointerup' && this.downOk &&
+      Math.hypot(e.offsetX - this.downX, e.offsetY - this.downY) < 6 &&
+      performance.now() - this.downT < 600;
+    this.downOk = false;
+    if (isClick) this.selectPoint(e.offsetX, e.offsetY);
+  };
+
+  /** Busca os dados da região clicada (o painel do info-gram lê o resultado do GlobeFacade). */
+  private selectPoint(x: number, y: number): void {
+    const pos = this.pickLonLat(x * this.invViewW * 2 - 1, -(y * this.invViewH) * 2 + 1);
+    if (!pos) return;                                  // clicou no espaço, fora do globo
+    this.currentPos = [pos.lat, pos.lon];
+    this.zone.run(() =>
+      this.globeFacade.getWeatherDataOfCoord(Math.round(pos.lat * 100) / 100, Math.round(pos.lon * 100) / 100));
+  }
 
   private hideTooltip(): void {
     if (this.tooltipEl && this.tipVisible) {
