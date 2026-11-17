@@ -1,6 +1,6 @@
-import { Component, inject } from '@angular/core';
-import { WeatherState } from '../../states/weather-state';
+import { Component, computed, inject } from '@angular/core';
 import { SlicePipe } from '@angular/common';
+import { GlobeFacade } from '../../facades/globe-facade';
 
 @Component({
   imports: [SlicePipe],
@@ -10,7 +10,21 @@ import { SlicePipe } from '@angular/common';
 })
 export class InfoGram {
 
-  protected weatherState = inject(WeatherState);
+  private facade = inject(GlobeFacade);
+
+  /**
+   * O clique no globo grava o ponto no GlobeFacade (selectedWeather, selectedAstronomy, ...).
+   * Este objeto junta esses signals no mesmo formato que o HTML já usa (weatherState.weatherState()),
+   * então o info-gram.html não muda.
+   */
+  protected weatherState = {
+    weatherState: computed(() => ({
+      clima: this.facade.selectedWeather(),
+      astronomia: this.facade.selectedAstronomy(),
+      qualidadeAr: this.facade.selectedAirQuality(),
+      hourly: this.facade.selectedHourly(),
+    })),
+  };
 
   getMoonPhaseName(phase: number): string {
     if (phase === 0 || phase === 1) return 'Lua Nova 🌑';
